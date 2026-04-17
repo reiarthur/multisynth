@@ -1,0 +1,71 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "multisynth"
+version = "0.1.0"
+description = "Multimodal multi-provider Python toolkit for text, audio, image, and video generation."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Arthur", email = "arthur@sart.dev" }
+]
+keywords = ["ai", "llm", "tts", "image-generation", "video-generation", "multimodal"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  "httpx>=0.28,<1",
+  "pydantic>=2.10,<3",
+  "Pillow>=10,<13",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2",
+  "pytest>=8.3",
+  "pytest-asyncio>=0.24",
+  "ruff>=0.11",
+  "twine>=6.1",
+]
+
+[project.urls]
+Homepage = "https://pypi.org/project/multisynth/"
+Repository = "https://github.com/reiarthur/multisynth"
+Issues = "https://github.com/reiarthur/multisynth/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/multisynth"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/.env.example",
+  "/src",
+  "/docs",
+  "/tests",
+  "/README.md",
+  "/LICENSE",
+  "/pyproject.toml",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "UP047"]

@@ -1,0 +1,10 @@
+.env
+.venv
+.venv-multisynth
+build/
+dist/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+tests/artefatos_testes/
