@@ -1,10 +1,35 @@
+# Credenciais e ambiente
 .env
 .venv
 .venv-multisynth
+
+# Build e distribuição
 build/
 dist/
+*.egg-info/
+*.egg
+
+# Caches Python
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
+
+# Cobertura de testes
+.coverage
+coverage.xml
+htmlcov/
+
+# Artefatos de testes locais
 tests/artefatos_testes/
+
+# Ferramentas de IA para desenvolvimento (instruções internas, não fazem parte da biblioteca)
+.claude/
+.codex
+CLAUDE.md
+AGENTS.md
+
+# Metadados de sistema operacional
+.DS_Store
+Thumbs.db
