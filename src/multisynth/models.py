@@ -1,4 +1,7 @@
-"""Canonical public models for multisynth."""
+"""Canonical public models for multisynth.
+
+Última atualização: 2026-04-17
+"""
 
 from __future__ import annotations
 
@@ -283,14 +286,25 @@ class ImageTransformationRequest(PublicModel):
 
 
 class ImageEditRequest(PublicModel):
-    """Request payload for image editing with an optional mask."""
+    """Request payload for image editing with an optional mask.
+
+    When `mask` is supplied, it must be a PNG grayscale image with the same
+    dimensions as `image`. **Black pixels (0) mark regions to be edited**;
+    white pixels (255) mark regions to preserve. The library converts the
+    mask internally to the format required by each provider.
+    """
 
     provider: str = Field(min_length=1, description="Provider name or supported alias.")
     prompt: str = Field(min_length=1, description="Instruction prompt for the edit.")
     image: str | bytes = Field(description="Base image as a local path, base64 string, or bytes.")
     mask: str | bytes | None = Field(
         default=None,
-        description="Optional mask as a local path, base64 string, or bytes.",
+        description=(
+            "Optional mask as a local path, base64 string, or bytes. "
+            "Must be a PNG grayscale image with the same dimensions as `image`. "
+            "Black pixels (0) mark regions to be edited; white pixels (255) mark regions to preserve. "
+            "Each provider adapter converts this mask internally to its own format."
+        ),
     )
     negative_prompt: str | None = Field(default=None, description="Optional negative prompt.")
     model: str | None = Field(default=None, description="Optional image model override.")

@@ -1,4 +1,13 @@
-"""Infraestrutura compartilhada para capacidades de imagem."""
+"""Infraestrutura compartilhada para capacidades de imagem.
+
+Convenção de máscara:
+    A biblioteca padroniza a máscara de entrada como PNG grayscale onde
+    **pixels pretos (0) = regiões editáveis** e
+    **pixels brancos (255) = regiões preservadas**.
+    Cada adapter converte internamente para o formato exigido pelo seu provider.
+
+Última atualização: 2026-04-17
+"""
 
 from __future__ import annotations
 
@@ -32,6 +41,8 @@ from .._core.http import (
 )
 from .._core.media import (
     codificar_base64,
+    converter_mascara_para_rgba_openai,
+    inverter_mascara,
     normalizar_entrada_binaria,
     validar_mascara_compativel,
 )
@@ -178,7 +189,8 @@ class OpenAIImageAdapter(ImageAdapter):
                 if isinstance(request, EditarImagemRequest) and request.mascara is not None:
                     mascara = normalizar_entrada_binaria(request.mascara, nome_campo="mascara")
                     validar_mascara_compativel(imagem.dados, mascara.dados)
-                    files["mask"] = ("mask.png", mascara.dados, mascara.mime_type or "image/png")
+                    # OpenAI usa canal alpha: transparente (alpha=0) = editar, opaco = preservar.
+                    files["mask"] = ("mask.png", converter_mascara_para_rgba_openai(mascara.dados), "image/png")
                 response = validar_resposta_http(client.post("/images/edits", data=data, files=files))
                 return ler_json(response)
 
@@ -214,7 +226,8 @@ class OpenAIImageAdapter(ImageAdapter):
                 if isinstance(request, EditarImagemRequest) and request.mascara is not None:
                     mascara = normalizar_entrada_binaria(request.mascara, nome_campo="mascara")
                     validar_mascara_compativel(imagem.dados, mascara.dados)
-                    files["mask"] = ("mask.png", mascara.dados, mascara.mime_type or "image/png")
+                    # OpenAI usa canal alpha: transparente (alpha=0) = editar, opaco = preservar.
+                    files["mask"] = ("mask.png", converter_mascara_para_rgba_openai(mascara.dados), "image/png")
                 response = validar_resposta_http(await client.post("/images/edits", data=data, files=files))
                 return ler_json(response)
 
@@ -332,7 +345,8 @@ class BFLImageAdapter(ImageAdapter):
             payload["image"] = codificar_base64(imagem.dados)
         if isinstance(request, EditarImagemRequest) and request.mascara is not None:
             mascara = normalizar_entrada_binaria(request.mascara, nome_campo="mascara")
-            payload["mask"] = codificar_base64(mascara.dados)
+            # BFL espera branco=editar; inverte a convenção de entrada (preto=editar).
+            payload["mask"] = codificar_base64(inverter_mascara(mascara.dados))
         if getattr(request, "seed", None) is not None:
             payload["seed"] = request.seed
         if request.parametros_provider:
@@ -511,7 +525,8 @@ class StabilityImageAdapter(ImageAdapter):
                     files["image"] = ("image.png", imagem.dados, imagem.mime_type or "image/png")
                 if isinstance(request, EditarImagemRequest) and request.mascara is not None:
                     mascara = normalizar_entrada_binaria(request.mascara, nome_campo="mascara")
-                    files["mask"] = ("mask.png", mascara.dados, mascara.mime_type or "image/png")
+                    # Stability espera branco=editar; inverte a convenção de entrada (preto=editar).
+                    files["mask"] = ("mask.png", inverter_mascara(mascara.dados), "image/png")
                 response = validar_resposta_http(client.post(self.endpoint, data=data, files=files or None))
                 payload = ler_json(response)
                 return _extrair_base64_ou_baixar(payload)
@@ -539,7 +554,8 @@ class StabilityImageAdapter(ImageAdapter):
                     files["image"] = ("image.png", imagem.dados, imagem.mime_type or "image/png")
                 if isinstance(request, EditarImagemRequest) and request.mascara is not None:
                     mascara = normalizar_entrada_binaria(request.mascara, nome_campo="mascara")
-                    files["mask"] = ("mask.png", mascara.dados, mascara.mime_type or "image/png")
+                    # Stability espera branco=editar; inverte a convenção de entrada (preto=editar).
+                    files["mask"] = ("mask.png", inverter_mascara(mascara.dados), "image/png")
                 response = validar_resposta_http(await client.post(self.endpoint, data=data, files=files or None))
                 payload = ler_json(response)
                 return await _extrair_base64_ou_baixar_async(payload)

@@ -1,4 +1,15 @@
-"""Binary/media normalization helpers safe for Python 3.12+."""
+"""Normalização de mídia binária e utilitários de máscara para imagens.
+
+Convenção de máscara adotada pela biblioteca:
+    - Entrada sempre em PNG grayscale.
+    - Pixels **brancos (255)** = regiões **preservadas** (não podem ser alteradas).
+    - Pixels **pretos (0)** = regiões **editáveis** (serão substituídas pelo provider).
+
+Cada provider recebe a máscara já convertida para o seu próprio padrão;
+o chamador nunca precisa conhecer o padrão interno de cada API.
+
+Última atualização: 2026-04-17
+"""
 
 from __future__ import annotations
 
@@ -8,7 +19,7 @@ from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 from .exceptions import IncompatibleParameterError, InvalidParameterError
 from .files import read_file_bytes
@@ -118,9 +129,56 @@ def validar_mascara_compativel(imagem_base: bytes, mascara: bytes) -> None:
         raise IncompatibleParameterError("Mask and base image must have exactly the same dimensions.")
 
 
+def inverter_mascara(mascara_bytes: bytes) -> bytes:
+    """Inverte uma máscara grayscale (preto vira branco e vice-versa).
+
+    Usado para providers que esperam **branco = editar** (Stability AI, BFL/FLUX),
+    convertendo a convenção de entrada da biblioteca — preto = editar — para o
+    padrão exigido por esses providers.
+
+    ### Parâmetros:
+        mascara_bytes: Bytes da máscara em qualquer formato suportado pelo Pillow.
+
+    ### Retorna:
+        Bytes PNG com a máscara invertida (branco=editar, preto=preservar).
+    """
+    img = abrir_imagem(mascara_bytes).convert("L")
+    buf = BytesIO()
+    ImageOps.invert(img).save(buf, format="PNG")
+    return buf.getvalue()
+
+
+def converter_mascara_para_rgba_openai(mascara_bytes: bytes) -> bytes:
+    """Converte máscara grayscale (preto=editar) para RGBA no padrão OpenAI.
+
+    A OpenAI espera um PNG RGBA onde o **canal alpha define a edição**:
+    alpha=0 (transparente) = editar; alpha=255 (opaco) = preservar.
+
+    Mapeamento aplicado:
+    - Pixel preto (0) na entrada → alpha=0 (transparente) → OpenAI edita.
+    - Pixel branco (255) na entrada → alpha=255 (opaco) → OpenAI preserva.
+
+    ### Parâmetros:
+        mascara_bytes: Bytes da máscara em qualquer formato suportado pelo Pillow.
+
+    ### Retorna:
+        Bytes PNG RGBA prontos para envio à API da OpenAI.
+    """
+    img = abrir_imagem(mascara_bytes).convert("L")
+    # Canal RGB todo preto; alpha recebe o valor grayscale diretamente:
+    # preto (0) → alpha 0 = transparente = editar; branco (255) → alpha 255 = preservar.
+    rgba = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    rgba.putalpha(img)
+    buf = BytesIO()
+    rgba.save(buf, format="PNG")
+    return buf.getvalue()
+
+
 ConteudoBinarioNormalizado = NormalizedBinaryContent
 encode_base64 = codificar_base64
 open_image = abrir_imagem
 get_image_dimensions = obter_dimensoes_imagem
 validate_compatible_mask = validar_mascara_compativel
 normalize_binary_input = normalizar_entrada_binaria
+invert_mask = inverter_mascara
+convert_mask_to_openai_rgba = converter_mascara_para_rgba_openai

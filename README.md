@@ -194,7 +194,7 @@ result = edit(
     provider="openai",
     prompt="Replace the sky with a dramatic sunset",
     image="/path/to/photo.png",
-    mask="/path/to/mask.png",  # white areas are edited, black areas are preserved
+    mask="/path/to/mask.png",  # black pixels = edited (inpainted), white pixels = preserved
     credentials={"OPENAI_API_KEY": "sk-..."},
 )
 
