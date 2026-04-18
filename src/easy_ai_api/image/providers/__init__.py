@@ -1,4 +1,7 @@
-"""Image provider registry builders."""
+"""Builders de registries de providers de imagem.
+
+Última atualização: 2026-04-18
+"""
 
 from __future__ import annotations
 
@@ -22,6 +25,7 @@ from .._adapters import (
 class ImageRegistries:
     generate: dict[str, ImageAdapter]
     transform: dict[str, ImageAdapter]
+    compose: dict[str, ImageAdapter]
     edit_without_mask: dict[str, ImageAdapter]
     edit_with_mask: dict[str, ImageAdapter]
 
@@ -125,6 +129,26 @@ def build_image_registries(credentials: Mapping[str, str] | CredentialStore | No
             ),
         )
     }
+    compose = {
+        adapter.provider: adapter
+        for adapter in (
+            GoogleImageAdapter(
+                provider="google",
+                default_model="gemini-2.5-flash-image-preview",
+                supported_models=frozenset({"gemini-2.5-flash-image-preview"}),
+                api_key=store.resolve("GOOGLE_API_KEY"),
+                capability="image_to_image",
+                credential_env_vars=get_required_env_vars("image", "compose", "google"),
+            ),
+            BFLImageAdapter(
+                provider="bfl",
+                default_model="flux-kontext-pro",
+                supported_models=frozenset({"flux-kontext-pro", "flux-kontext-max"}),
+                api_key=store.resolve("BFL_API_KEY"),
+                credential_env_vars=get_required_env_vars("image", "compose", "bfl"),
+            ),
+        )
+    }
     edit_without_mask = {
         adapter.provider: adapter
         for adapter in (
@@ -211,6 +235,7 @@ def build_image_registries(credentials: Mapping[str, str] | CredentialStore | No
     return ImageRegistries(
         generate=generate,
         transform=transform,
+        compose=compose,
         edit_without_mask=edit_without_mask,
         edit_with_mask=edit_with_mask,
     )

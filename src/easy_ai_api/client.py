@@ -1,4 +1,7 @@
-"""Optional client object with shared credentials and request defaults."""
+"""Cliente opcional com credenciais e defaults compartilhados.
+
+Última atualização: 2026-04-18
+"""
 
 from __future__ import annotations
 
@@ -19,9 +22,9 @@ class _ClientDefaults:
 
 
 class _BaseFacade:
-    """Base helper used by the modality namespaces exposed on ``Multisynth``."""
+    """Base helper used by the modality namespaces exposed on ``EasyAiApi``."""
 
-    def __init__(self, client: Multisynth) -> None:
+    def __init__(self, client: EasyAiApi) -> None:
         self._client = client
 
     def _with_defaults(self, kwargs: dict[str, object], *, job: bool = False) -> dict[str, object]:
@@ -43,7 +46,7 @@ class _TextFacade(_BaseFacade):
     """Stateful namespace for text generation helpers."""
 
     def generate(self, request=None, /, **kwargs):
-        """Call :func:`multisynth.text.generate` with shared client defaults."""
+        """Chama :func:`easy_ai_api.text.generate` com defaults do cliente."""
 
         return text_api.generate(
             request,
@@ -52,7 +55,7 @@ class _TextFacade(_BaseFacade):
         )
 
     async def generate_async(self, request=None, /, **kwargs):
-        """Async variant of :meth:`generate`."""
+        """Variante assíncrona de :meth:`generate`."""
 
         return await text_api.generate_async(
             request,
@@ -61,12 +64,12 @@ class _TextFacade(_BaseFacade):
         )
 
     def batch_generate(self, requests, /, **kwargs):
-        """Call :func:`multisynth.text.batch_generate` with shared credentials."""
+        """Chama :func:`easy_ai_api.text.batch_generate` com credenciais compartilhadas."""
 
         return text_api.batch_generate(requests, credentials=self._client.credentials, **kwargs)
 
     async def batch_generate_async(self, requests, /, **kwargs):
-        """Async variant of :meth:`batch_generate`."""
+        """Variante assíncrona de :meth:`batch_generate`."""
 
         return await text_api.batch_generate_async(
             requests,
@@ -79,7 +82,7 @@ class _AudioFacade(_BaseFacade):
     """Stateful namespace for audio helpers."""
 
     def transcribe(self, request=None, /, **kwargs):
-        """Call :func:`multisynth.audio.transcribe` with shared defaults."""
+        """Chama :func:`easy_ai_api.audio.transcribe` com defaults compartilhados."""
 
         return audio_api.transcribe(
             request,
@@ -88,7 +91,7 @@ class _AudioFacade(_BaseFacade):
         )
 
     async def transcribe_async(self, request=None, /, **kwargs):
-        """Async variant of :meth:`transcribe`."""
+        """Variante assíncrona de :meth:`transcribe`."""
 
         return await audio_api.transcribe_async(
             request,
@@ -97,7 +100,7 @@ class _AudioFacade(_BaseFacade):
         )
 
     def synthesize(self, request=None, /, **kwargs):
-        """Call :func:`multisynth.audio.synthesize` with shared defaults."""
+        """Chama :func:`easy_ai_api.audio.synthesize` com defaults compartilhados."""
 
         return audio_api.synthesize(
             request,
@@ -106,7 +109,7 @@ class _AudioFacade(_BaseFacade):
         )
 
     async def synthesize_async(self, request=None, /, **kwargs):
-        """Async variant of :meth:`synthesize`."""
+        """Variante assíncrona de :meth:`synthesize`."""
 
         return await audio_api.synthesize_async(
             request,
@@ -115,7 +118,7 @@ class _AudioFacade(_BaseFacade):
         )
 
     def compose(self, request=None, /, **kwargs):
-        """Call :func:`multisynth.audio.compose` with shared defaults."""
+        """Chama :func:`easy_ai_api.audio.compose` com defaults compartilhados."""
 
         return audio_api.compose(
             request,
@@ -124,7 +127,7 @@ class _AudioFacade(_BaseFacade):
         )
 
     async def compose_async(self, request=None, /, **kwargs):
-        """Async variant of :meth:`compose`."""
+        """Variante assíncrona de :meth:`compose`."""
 
         return await audio_api.compose_async(
             request,
@@ -137,7 +140,7 @@ class _ImageFacade(_BaseFacade):
     """Stateful namespace for image helpers."""
 
     def generate(self, request=None, /, **kwargs):
-        """Call :func:`multisynth.image.generate` with shared defaults."""
+        """Chama :func:`easy_ai_api.image.generate` com defaults compartilhados."""
 
         return image_api.generate(
             request,
@@ -146,7 +149,7 @@ class _ImageFacade(_BaseFacade):
         )
 
     async def generate_async(self, request=None, /, **kwargs):
-        """Async variant of :meth:`generate`."""
+        """Variante assíncrona de :meth:`generate`."""
 
         return await image_api.generate_async(
             request,
@@ -155,7 +158,7 @@ class _ImageFacade(_BaseFacade):
         )
 
     def transform(self, request=None, /, **kwargs):
-        """Call :func:`multisynth.image.transform` with shared defaults."""
+        """Chama :func:`easy_ai_api.image.transform` com defaults compartilhados."""
 
         return image_api.transform(
             request,
@@ -164,7 +167,7 @@ class _ImageFacade(_BaseFacade):
         )
 
     async def transform_async(self, request=None, /, **kwargs):
-        """Async variant of :meth:`transform`."""
+        """Variante assíncrona de :meth:`transform`."""
 
         return await image_api.transform_async(
             request,
@@ -172,8 +175,26 @@ class _ImageFacade(_BaseFacade):
             **self._with_defaults(kwargs),
         )
 
+    def compose(self, request=None, /, **kwargs):
+        """Chama :func:`easy_ai_api.image.compose` com defaults compartilhados."""
+
+        return image_api.compose(
+            request,
+            credentials=self._client.credentials,
+            **self._with_defaults(kwargs),
+        )
+
+    async def compose_async(self, request=None, /, **kwargs):
+        """Variante assíncrona de :meth:`compose`."""
+
+        return await image_api.compose_async(
+            request,
+            credentials=self._client.credentials,
+            **self._with_defaults(kwargs),
+        )
+
     def edit(self, request=None, /, **kwargs):
-        """Call :func:`multisynth.image.edit` with shared defaults."""
+        """Chama :func:`easy_ai_api.image.edit` com defaults compartilhados."""
 
         return image_api.edit(
             request,
@@ -182,7 +203,7 @@ class _ImageFacade(_BaseFacade):
         )
 
     async def edit_async(self, request=None, /, **kwargs):
-        """Async variant of :meth:`edit`."""
+        """Variante assíncrona de :meth:`edit`."""
 
         return await image_api.edit_async(
             request,
@@ -195,7 +216,7 @@ class _VideoFacade(_BaseFacade):
     """Stateful namespace for video helpers."""
 
     def generate(self, request=None, /, **kwargs):
-        """Call :func:`multisynth.video.generate` with shared job defaults."""
+        """Chama :func:`easy_ai_api.video.generate` com defaults de job."""
 
         return video_api.generate(
             request,
@@ -204,7 +225,7 @@ class _VideoFacade(_BaseFacade):
         )
 
     async def generate_async(self, request=None, /, **kwargs):
-        """Async variant of :meth:`generate`."""
+        """Variante assíncrona de :meth:`generate`."""
 
         return await video_api.generate_async(
             request,
@@ -213,7 +234,7 @@ class _VideoFacade(_BaseFacade):
         )
 
     def lipsync(self, request=None, /, **kwargs):
-        """Call :func:`multisynth.video.lipsync` with shared job defaults."""
+        """Chama :func:`easy_ai_api.video.lipsync` com defaults de job."""
 
         return video_api.lipsync(
             request,
@@ -222,7 +243,7 @@ class _VideoFacade(_BaseFacade):
         )
 
     async def lipsync_async(self, request=None, /, **kwargs):
-        """Async variant of :meth:`lipsync`."""
+        """Variante assíncrona de :meth:`lipsync`."""
 
         return await video_api.lipsync_async(
             request,
@@ -231,21 +252,21 @@ class _VideoFacade(_BaseFacade):
         )
 
 
-class Multisynth:
-    """Stateful client that shares credentials and request defaults.
+class EasyAiApi:
+    """Cliente com credenciais e defaults compartilhados para todas as chamadas.
 
     Args:
-        credentials: Explicit credentials used before environment variables.
-        timeout_seconds: Default timeout applied to text, audio, and image
-            operations when a call does not override it.
-        job_timeout_seconds: Default timeout applied to long-running video jobs.
-        max_retries: Default retry count shared across all modality helpers.
+        credentials: Credenciais explícitas usadas antes das variáveis de ambiente.
+        timeout_seconds: Timeout padrão para operações de texto, áudio e imagem quando
+            uma chamada específica não sobrescreve.
+        job_timeout_seconds: Timeout padrão para jobs de vídeo de longa duração.
+        max_retries: Quantidade padrão de retries compartilhada entre as modalidades.
 
     Attributes:
-        text: Namespace exposing text-generation methods.
-        audio: Namespace exposing transcription, synthesis, and music methods.
-        image: Namespace exposing image generation, transform, and edit methods.
-        video: Namespace exposing video generation and lip-sync methods.
+        text: Namespace com métodos de geração de texto.
+        audio: Namespace com transcrição, síntese e música.
+        image: Namespace com geração, transformação, composição e edição de imagens.
+        video: Namespace com geração e lip-sync de vídeo.
     """
 
     def __init__(

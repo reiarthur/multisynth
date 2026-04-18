@@ -1,4 +1,7 @@
-"""Public text generation helpers for multisynth."""
+"""Helpers públicos de geração de texto de easy-ai-api.
+
+Última atualização: 2026-04-18
+"""
 
 from __future__ import annotations
 

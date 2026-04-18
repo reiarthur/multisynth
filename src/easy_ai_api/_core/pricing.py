@@ -120,6 +120,24 @@ PRICING_TABLE: dict[str, dict[str, TextPricing]] = {
             output_per_million=Decimal("10.00"),
         ),
     },
+    "perplexity": {
+        "sonar-pro": TextPricing(
+            input_per_million=Decimal("3.00"),
+            output_per_million=Decimal("15.00"),
+        ),
+    },
+    "deepinfra": {
+        "openai/gpt-oss-20b": TextPricing(
+            input_per_million=Decimal("0.04"),
+            output_per_million=Decimal("0.15"),
+        ),
+    },
+    "huggingface": {
+        "meta-llama/Llama-3.1-8B-Instruct": TextPricing(
+            input_per_million=Decimal("0.03"),
+            output_per_million=Decimal("0.06"),
+        ),
+    },
 }
 
 

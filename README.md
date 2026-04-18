@@ -1,17 +1,18 @@
-# multisynth
+# easy-ai-api
 
-[![PyPI version](https://img.shields.io/pypi/v/multisynth.svg)](https://pypi.org/project/multisynth/)
-[![Python versions](https://img.shields.io/pypi/pyversions/multisynth.svg)](https://pypi.org/project/multisynth/)
+[![PyPI version](https://img.shields.io/pypi/v/easy-ai-api.svg)](https://pypi.org/project/easy-ai-api/)
+[![Python versions](https://img.shields.io/pypi/pyversions/easy-ai-api.svg)](https://pypi.org/project/easy-ai-api/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-`multisynth` is a typed, multimodal Python library that wraps multiple AI providers behind a single public API for:
+`easy-ai-api` is a typed, multimodal Python library that wraps multiple AI providers behind a single public API for:
 
-- **Text generation** — chat, instructions, reasoning, tool use, batch
+- **Text generation** — chat, instructions, reasoning, tool use, batch, optional image inputs (vision)
 - **Speech transcription** — audio to text with word timings and speaker diarization
 - **Speech synthesis** — text to spoken audio
 - **Music generation** — text prompt to instrumental audio
 - **Image generation** — text to image
 - **Image transformation** — prompt + input image to new image
+- **Image composition** — prompt + base image + reference image to a new image
 - **Image editing** — inpainting with optional mask
 - **Video generation** — text/image/audio to video
 - **Lip sync** — animate a face image with an audio track
@@ -26,7 +27,7 @@ All operations are available in synchronous and asynchronous variants. Provider 
 ## Install
 
 ```bash
-pip install multisynth
+pip install easy-ai-api
 ```
 
 For local development (includes test and lint tools):
@@ -38,19 +39,19 @@ pip install -e ".[dev]"
 ## Checking the version
 
 ```python
-import multisynth
+import easy_ai_api
 
-print(multisynth.__version__)
+print(easy_ai_api.__version__)
 ```
 
 ## Configuration
 
 Credentials are resolved lazily, in this order:
 
-1. Explicit `credentials={...}` values passed to a call or to `Multisynth(...)`.
+1. Explicit `credentials={...}` values passed to a call or to `EasyAiApi(...)`.
 2. Environment variables from the current process.
 
-`multisynth` does **not** auto-load `.env` files, keeping imports side-effect free.
+`easy-ai-api` does **not** auto-load `.env` files, keeping imports side-effect free.
 
 ### Environment variable setup
 
@@ -78,7 +79,7 @@ See [`docs/configuration.md`](docs/configuration.md) for full details and per-ca
 ### Text generation
 
 ```python
-from multisynth.text import generate
+from easy_ai_api.text import generate
 
 result = generate(
     provider="openai",
@@ -90,10 +91,29 @@ print(result.text)
 print(result.cost_usd)
 ```
 
+### Text generation with image input (vision)
+
+Pass one or more images via `input_images` to describe them, transcribe text in the image, or answer questions grounded in visual content. Accepts local paths, raw `bytes`, or base64 strings.
+
+```python
+from easy_ai_api.text import generate
+
+result = generate(
+    provider="openai",
+    instructions="Describe the image in one concise paragraph.",
+    input_images=["/path/to/photo.jpg"],
+    credentials={"OPENAI_API_KEY": "sk-..."},
+)
+
+print(result.text)
+```
+
+Vision-capable providers include `openai`, `google`, `anthropic`, and any provider whose selected model supports image inputs.
+
 ### Speech transcription
 
 ```python
-from multisynth.audio import transcribe
+from easy_ai_api.audio import transcribe
 
 result = transcribe(
     provider="deepgram",
@@ -113,7 +133,7 @@ for segment in result.speaker_segments:
 ### Speech synthesis
 
 ```python
-from multisynth.audio import synthesize
+from easy_ai_api.audio import synthesize
 
 result = synthesize(
     provider="elevenlabs",
@@ -130,7 +150,7 @@ with open("output.mp3", "wb") as f:
 ### Music generation
 
 ```python
-from multisynth.audio import compose
+from easy_ai_api.audio import compose
 
 result = compose(
     provider="stability",
@@ -148,7 +168,7 @@ with open("music.mp3", "wb") as f:
 ### Image generation
 
 ```python
-from multisynth.image import generate
+from easy_ai_api.image import generate
 
 result = generate(
     provider="openai",
@@ -167,7 +187,7 @@ with open("output.png", "wb") as f:
 Takes an existing image and transforms it according to a prompt.
 
 ```python
-from multisynth.image import transform
+from easy_ai_api.image import transform
 
 result = transform(
     provider="stability",
@@ -183,12 +203,37 @@ with open("transformed.png", "wb") as f:
     f.write(image_bytes)
 ```
 
+### Image composition
+
+Combines a base image with a reference image using a prompt. Use it to apply the
+style, pose, or scene of the reference image to the subject of the base image.
+Typical prompts: *"render the person of image 1 in the pose of image 2"*,
+*"image 1 in the style of image 2"*, *"place the subject of image 1 in the
+scene of image 2"*.
+
+```python
+from easy_ai_api.image import compose
+
+result = compose(
+    provider="google",
+    prompt="Render the person of image 1 in the painting style of image 2",
+    image="/path/to/subject.jpg",
+    reference_image="/path/to/style_reference.jpg",
+    credentials={"GOOGLE_API_KEY": "..."},
+)
+
+import base64
+image_bytes = base64.b64decode(result.image_base64)
+with open("composed.png", "wb") as f:
+    f.write(image_bytes)
+```
+
 ### Image editing
 
 Edits specific regions of an image using a prompt. Pass a `mask` to limit edits to the masked area.
 
 ```python
-from multisynth.image import edit
+from easy_ai_api.image import edit
 
 result = edit(
     provider="openai",
@@ -209,7 +254,7 @@ with open("edited.png", "wb") as f:
 Video files are written directly to a local path. Long-running jobs are polled until completion.
 
 ```python
-from multisynth.video import generate
+from easy_ai_api.video import generate
 
 result = generate(
     provider="runway",
@@ -224,7 +269,7 @@ print(result.output_path)  # pathlib.Path to the written file
 To generate a video driven by both a reference image and an audio track:
 
 ```python
-from multisynth.video import generate
+from easy_ai_api.video import generate
 
 result = generate(
     provider="heygen",
@@ -240,7 +285,7 @@ result = generate(
 Animate a still image or avatar portrait using a supplied audio track.
 
 ```python
-from multisynth.video import lipsync
+from easy_ai_api.video import lipsync
 
 result = lipsync(
     provider="heygen",
@@ -257,12 +302,12 @@ print(result.output_path)
 
 ## Stateful client
 
-Use `Multisynth` to share credentials and default settings across many calls:
+Use `EasyAiApi` to share credentials and default settings across many calls:
 
 ```python
-from multisynth import Multisynth
+from easy_ai_api import EasyAiApi
 
-client = Multisynth(
+client = EasyAiApi(
     credentials={"OPENAI_API_KEY": "sk-..."},
     timeout_seconds=90,
     job_timeout_seconds=900,
@@ -279,6 +324,13 @@ image_result = client.image.generate(
     provider="openai",
     prompt="Abstract geometric art in blue and gold",
 )
+
+composed = client.image.compose(
+    provider="google",
+    prompt="Put the person of image 1 in the scene of image 2",
+    image="/path/to/subject.jpg",
+    reference_image="/path/to/scene.jpg",
+)
 ```
 
 ---
@@ -290,8 +342,8 @@ Every helper has an `_async` variant. Combine them with `asyncio.gather` for con
 ```python
 import asyncio
 
-from multisynth.image import generate_async
-from multisynth.text import generate_async as text_generate_async
+from easy_ai_api.image import generate_async
+from easy_ai_api.text import generate_async as text_generate_async
 
 
 async def main() -> None:
@@ -318,29 +370,29 @@ asyncio.run(main())
 
 ## Public API
 
-### `multisynth.text`
+### `easy_ai_api.text`
 
 ```python
-from multisynth.text import batch_generate, batch_generate_async, generate, generate_async
-from multisynth.models import TextGenerationRequest, TextGenerationResult
+from easy_ai_api.text import batch_generate, batch_generate_async, generate, generate_async
+from easy_ai_api.models import TextGenerationRequest, TextGenerationResult
 ```
 
 | Function | Description |
 |---|---|
-| `generate(provider, instructions, ...)` | Generate text from a single prompt. |
+| `generate(provider, instructions, ...)` | Generate text from a single prompt. Accepts `input_images` for vision. |
 | `generate_async(...)` | Async variant. |
 | `batch_generate(requests, ...)` | Run multiple requests to the same provider concurrently. |
 | `batch_generate_async(...)` | Async variant. |
 
-### `multisynth.audio`
+### `easy_ai_api.audio`
 
 ```python
-from multisynth.audio import (
+from easy_ai_api.audio import (
     compose, compose_async,
     synthesize, synthesize_async,
     transcribe, transcribe_async,
 )
-from multisynth.models import (
+from easy_ai_api.models import (
     MusicGenerationRequest, MusicGenerationResult,
     SpeechSynthesisRequest, SpeechSynthesisResult,
     SpeechTranscriptionRequest, SpeechTranscriptionResult,
@@ -353,15 +405,17 @@ from multisynth.models import (
 | `synthesize(provider, text, ...)` | Synthesize speech audio from text. |
 | `compose(provider, prompt, ...)` | Generate instrumental music from a text prompt. |
 
-### `multisynth.image`
+### `easy_ai_api.image`
 
 ```python
-from multisynth.image import (
+from easy_ai_api.image import (
+    compose, compose_async,
     edit, edit_async,
     generate, generate_async,
     transform, transform_async,
 )
-from multisynth.models import (
+from easy_ai_api.models import (
+    ImageCompositionRequest,
     ImageEditRequest,
     ImageGenerationRequest,
     ImageResult,
@@ -373,13 +427,14 @@ from multisynth.models import (
 |---|---|
 | `generate(provider, prompt, ...)` | Generate an image from a text prompt. |
 | `transform(provider, prompt, image, ...)` | Transform an input image guided by a prompt. |
+| `compose(provider, prompt, image, reference_image, ...)` | Combine a base image with a reference image using a prompt. |
 | `edit(provider, prompt, image, ...)` | Edit an image region with an optional mask. |
 
-### `multisynth.video`
+### `easy_ai_api.video`
 
 ```python
-from multisynth.video import generate, generate_async, lipsync, lipsync_async
-from multisynth.models import LipSyncRequest, VideoGenerationRequest, VideoResult
+from easy_ai_api.video import generate, generate_async, lipsync, lipsync_async
+from easy_ai_api.models import LipSyncRequest, VideoGenerationRequest, VideoResult
 ```
 
 | Function | Description |
@@ -390,14 +445,14 @@ from multisynth.models import LipSyncRequest, VideoGenerationRequest, VideoResul
 ### Exceptions
 
 ```python
-from multisynth.exceptions import (
+from easy_ai_api.exceptions import (
     ConfigurationError,
+    EasyAiApiError,
     IncompatibleParameterError,
     InvalidParameterError,
     InvalidProviderResponseError,
     JobFailedError,
     MissingCredentialError,
-    MultisynthError,
     PricingUnavailableError,
     ProviderTimeoutError,
     TemporaryDownloadError,
@@ -428,6 +483,8 @@ See [`docs/errors.md`](docs/errors.md) for descriptions and handling patterns.
 | `google` | `GOOGLE_API_KEY` |
 | `cohere` | `COHERE_API_KEY` |
 | `perplexity` | `PERPLEXITY_API_KEY` |
+| `deepinfra` | `DEEPINFRA_API_KEY` |
+| `huggingface` | `HUGGINGFACE_API_KEY` |
 
 ### Audio — transcription
 
@@ -479,6 +536,13 @@ See [`docs/errors.md`](docs/errors.md) for descriptions and handling patterns.
 | `ideogram` | `IDEOGRAM_API_KEY` |
 | `stability` | `STABILITY_API_KEY` |
 
+### Image — compose
+
+| Provider | Env var |
+|---|---|
+| `google` | `GOOGLE_API_KEY` |
+| `bfl` | `BFL_API_KEY` |
+
 ### Image — edit
 
 | Provider | Env var |
@@ -519,11 +583,11 @@ See [`docs/errors.md`](docs/errors.md) for descriptions and handling patterns.
 
 ## Error handling
 
-`multisynth` uses typed exceptions so your code can handle failures intentionally.
+`easy-ai-api` uses typed exceptions so your code can handle failures intentionally.
 
 ```python
-from multisynth.exceptions import MissingCredentialError, UnsupportedProviderError
-from multisynth.text import generate
+from easy_ai_api.exceptions import MissingCredentialError, UnsupportedProviderError
+from easy_ai_api.text import generate
 
 try:
     result = generate(provider="openai", instructions="Write one sentence.")
@@ -557,6 +621,8 @@ Many providers accept common aliases:
 | `eleven-labs` | `elevenlabs` |
 | `assembly-ai` | `assemblyai` |
 | `pplx` | `perplexity` |
+| `deep-infra` | `deepinfra` |
+| `hugging-face`, `hf` | `huggingface` |
 
 ---
 

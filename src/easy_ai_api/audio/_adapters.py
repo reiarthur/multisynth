@@ -637,7 +637,7 @@ class RevAIAdapter(SpeechToTextAdapter):
                 client.post(
                     "/jobs",
                     files={"media": ("audio.bin", audio.dados, audio.mime_type or "application/octet-stream")},
-                    data={"metadata": "multisynth", "skip_diarization": str(not request.diarizacao).lower()},
+                    data={"metadata": "easy-ai-api", "skip_diarization": str(not request.diarizacao).lower()},
                 )
             )
             created = ler_json(response)
@@ -678,7 +678,7 @@ class RevAIAdapter(SpeechToTextAdapter):
                 await client.post(
                     "/jobs",
                     files={"media": ("audio.bin", audio.dados, audio.mime_type or "application/octet-stream")},
-                    data={"metadata": "multisynth", "skip_diarization": str(not request.diarizacao).lower()},
+                    data={"metadata": "easy-ai-api", "skip_diarization": str(not request.diarizacao).lower()},
                 )
             )
             created = ler_json(response)

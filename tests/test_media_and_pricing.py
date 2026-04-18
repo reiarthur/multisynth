@@ -1,8 +1,8 @@
 import base64
 from decimal import Decimal
 
-from multisynth._core.media import infer_mime_type, normalizar_entrada_binaria
-from multisynth._core.pricing import TokenUsage, calcular_custo_usd
+from easy_ai_api._core.media import infer_mime_type, normalizar_entrada_binaria
+from easy_ai_api._core.pricing import TokenUsage, calcular_custo_usd
 
 _ONE_PIXEL_PNG = base64.b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9WnR0WQAAAAASUVORK5CYII="

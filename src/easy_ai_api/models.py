@@ -1,6 +1,6 @@
-"""Canonical public models for multisynth.
+"""Modelos públicos canônicos de easy-ai-api.
 
-Última atualização: 2026-04-17
+Última atualização: 2026-04-18
 """
 
 from __future__ import annotations
@@ -66,7 +66,7 @@ class SpeakerSegment(PublicModel):
 
 
 class TextGenerationRequest(PublicModel):
-    """Request payload for ``multisynth.text`` helpers.
+    """Request payload for ``easy_ai_api.text`` helpers.
 
     Attributes:
         provider: Provider name or supported alias.
@@ -276,6 +276,48 @@ class ImageTransformationRequest(PublicModel):
     negative_prompt: str | None = Field(default=None, description="Optional negative prompt.")
     model: str | None = Field(default=None, description="Optional image model override.")
     strength: float | None = Field(default=None, ge=0, le=1, description="Transformation strength when supported.")
+    seed: int | None = Field(default=None, description="Optional deterministic seed.")
+    timeout_seconds: float = Field(default=DEFAULT_TIMEOUT_SECONDS, gt=0, description="Per-call timeout in seconds.")
+    max_retries: int = Field(default=DEFAULT_RETRIES, ge=1, le=10, description="Maximum retry attempts.")
+    provider_params: dict[str, Any] | None = Field(
+        default=None,
+        description="Raw provider-specific payload extensions.",
+    )
+
+
+class ImageCompositionRequest(PublicModel):
+    """Request payload para composição imagem+imagem+texto → imagem.
+
+    Recebe ``image`` como imagem-base (sujeito principal a transformar) e
+    ``reference_image`` como imagem adicional de referência (estilo, cena,
+    pose ou qualquer outra inspiração). O ``prompt`` descreve como combinar
+    as duas imagens. Úteis, por exemplo, para pedir "gere a pessoa da
+    imagem 1 no estilo da imagem 2" ou "coloque a pessoa da imagem 1 na
+    cena da imagem 2".
+
+    Attributes:
+        provider: Nome do provider ou alias suportado.
+        prompt: Instrução descrevendo como combinar as imagens.
+        image: Imagem principal a ser transformada.
+        reference_image: Imagem adicional usada como referência.
+        negative_prompt: Prompt negativo opcional.
+        model: Override opcional do modelo do provider.
+        strength: Intensidade opcional da composição quando suportada.
+        seed: Seed determinística opcional.
+        timeout_seconds: Timeout por chamada em segundos.
+        max_retries: Máximo de tentativas para falhas retryable.
+        provider_params: Extensões brutas de payload específicas do provider.
+    """
+
+    provider: str = Field(min_length=1, description="Provider name or supported alias.")
+    prompt: str = Field(min_length=1, description="Instruction prompt describing how to combine both images.")
+    image: str | bytes = Field(description="Base image as a local path, base64 string, or bytes.")
+    reference_image: str | bytes = Field(
+        description="Reference image as a local path, base64 string, or bytes.",
+    )
+    negative_prompt: str | None = Field(default=None, description="Optional negative prompt.")
+    model: str | None = Field(default=None, description="Optional image model override.")
+    strength: float | None = Field(default=None, ge=0, le=1, description="Composition strength when supported.")
     seed: int | None = Field(default=None, description="Optional deterministic seed.")
     timeout_seconds: float = Field(default=DEFAULT_TIMEOUT_SECONDS, gt=0, description="Per-call timeout in seconds.")
     max_retries: int = Field(default=DEFAULT_RETRIES, ge=1, le=10, description="Maximum retry attempts.")

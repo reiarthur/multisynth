@@ -8,6 +8,9 @@ from .._core.aliases import normalizar_api
 from .._core.credentials import CredentialStore
 from .._core.public_api import coerce_request
 from .._core.schemas import (
+    ComporImagemRequest as InternalImageCompositionRequest,
+)
+from .._core.schemas import (
     EditarImagemRequest as InternalImageEditRequest,
 )
 from .._core.schemas import (
@@ -17,6 +20,7 @@ from .._core.schemas import (
     TextoParaImagemRequest as InternalImageGenerationRequest,
 )
 from ..models import (
+    ImageCompositionRequest,
     ImageEditRequest,
     ImageGenerationRequest,
     ImageResult,
@@ -149,6 +153,68 @@ async def transform_async(
     )
 
 
+def compose(
+    request: ImageCompositionRequest | None = None,
+    /,
+    *,
+    credentials: Mapping[str, str] | None = None,
+    **kwargs: object,
+) -> ImageResult:
+    """Compose a new image from a base image, a reference image and a prompt."""
+
+    request = coerce_request(request, ImageCompositionRequest, kwargs)
+    provider = normalizar_api(request.provider)
+    adapter = _registries(credentials).compose[provider]
+    internal = InternalImageCompositionRequest(
+        prompt=request.prompt,
+        imagem=request.image,
+        imagem_referencia=request.reference_image,
+        negative_prompt=request.negative_prompt,
+        modelo=request.model,
+        intensidade=request.strength,
+        seed=request.seed,
+        timeout_segundos=request.timeout_seconds,
+        max_tentativas=request.max_retries,
+        parametros_provider=request.provider_params,
+    )
+    image_base64 = adapter.gerar(internal)
+    return ImageResult(
+        image_base64=image_base64,
+        metadata={"provider": provider, "model": adapter.resolve_model(internal.modelo)},
+    )
+
+
+async def compose_async(
+    request: ImageCompositionRequest | None = None,
+    /,
+    *,
+    credentials: Mapping[str, str] | None = None,
+    **kwargs: object,
+) -> ImageResult:
+    """Async variant of :func:`compose`."""
+
+    request = coerce_request(request, ImageCompositionRequest, kwargs)
+    provider = normalizar_api(request.provider)
+    adapter = _registries(credentials).compose[provider]
+    internal = InternalImageCompositionRequest(
+        prompt=request.prompt,
+        imagem=request.image,
+        imagem_referencia=request.reference_image,
+        negative_prompt=request.negative_prompt,
+        modelo=request.model,
+        intensidade=request.strength,
+        seed=request.seed,
+        timeout_segundos=request.timeout_seconds,
+        max_tentativas=request.max_retries,
+        parametros_provider=request.provider_params,
+    )
+    image_base64 = await adapter.gerar_async(internal)
+    return ImageResult(
+        image_base64=image_base64,
+        metadata={"provider": provider, "model": adapter.resolve_model(internal.modelo)},
+    )
+
+
 def edit(
     request: ImageEditRequest | None = None,
     /,
@@ -219,4 +285,13 @@ async def edit_async(
     )
 
 
-__all__ = ["edit", "edit_async", "generate", "generate_async", "transform", "transform_async"]
+__all__ = [
+    "compose",
+    "compose_async",
+    "edit",
+    "edit_async",
+    "generate",
+    "generate_async",
+    "transform",
+    "transform_async",
+]

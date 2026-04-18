@@ -49,6 +49,7 @@ from .._core.media import (
 from .._core.polling import aguardar_job, aguardar_job_async
 from .._core.retry import executar_com_retry, executar_com_retry_async
 from .._core.schemas import (
+    ComporImagemRequest,
     EditarImagemRequest,
     TextoImagemParaImagemRequest,
     TextoParaImagemRequest,
@@ -245,7 +246,7 @@ class GoogleImageAdapter(ImageAdapter):
 
     capability: str = "text_to_image"
 
-    def _montar_payload(self, request: TextoParaImagemRequest | TextoImagemParaImagemRequest | EditarImagemRequest) -> dict[str, Any]:
+    def _montar_payload(self, request: TextoParaImagemRequest | TextoImagemParaImagemRequest | EditarImagemRequest | ComporImagemRequest) -> dict[str, Any]:
         parts: list[dict[str, Any]] = [{"text": request.prompt}]
         if hasattr(request, "imagem"):
             imagem = normalizar_entrada_binaria(request.imagem, nome_campo="imagem")
@@ -254,6 +255,16 @@ class GoogleImageAdapter(ImageAdapter):
                     "inline_data": {
                         "mime_type": imagem.mime_type or "image/png",
                         "data": codificar_base64(imagem.dados),
+                    }
+                }
+            )
+        if isinstance(request, ComporImagemRequest):
+            referencia = normalizar_entrada_binaria(request.imagem_referencia, nome_campo="imagem_referencia")
+            parts.append(
+                {
+                    "inline_data": {
+                        "mime_type": referencia.mime_type or "image/png",
+                        "data": codificar_base64(referencia.dados),
                     }
                 }
             )
@@ -338,11 +349,14 @@ class GoogleImageAdapter(ImageAdapter):
 class BFLImageAdapter(ImageAdapter):
     """Adapter para Black Forest Labs / FLUX com jobs assincronos."""
 
-    def _montar_payload(self, request: TextoParaImagemRequest | TextoImagemParaImagemRequest | EditarImagemRequest) -> dict[str, Any]:
+    def _montar_payload(self, request: TextoParaImagemRequest | TextoImagemParaImagemRequest | EditarImagemRequest | ComporImagemRequest) -> dict[str, Any]:
         payload: dict[str, Any] = {"prompt": request.prompt}
         if hasattr(request, "imagem"):
             imagem = normalizar_entrada_binaria(request.imagem, nome_campo="imagem")
             payload["image"] = codificar_base64(imagem.dados)
+        if isinstance(request, ComporImagemRequest):
+            referencia = normalizar_entrada_binaria(request.imagem_referencia, nome_campo="imagem_referencia")
+            payload["image_prompt"] = codificar_base64(referencia.dados)
         if isinstance(request, EditarImagemRequest) and request.mascara is not None:
             mascara = normalizar_entrada_binaria(request.mascara, nome_campo="mascara")
             # BFL espera branco=editar; inverte a convenção de entrada (preto=editar).

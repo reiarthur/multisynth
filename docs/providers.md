@@ -18,6 +18,8 @@ The tables below describe the public provider matrix and the environment variabl
 | `google` | `GOOGLE_API_KEY` |
 | `cohere` | `COHERE_API_KEY` |
 | `perplexity` | `PERPLEXITY_API_KEY` |
+| `deepinfra` | `DEEPINFRA_API_KEY` |
+| `huggingface` | `HUGGINGFACE_API_KEY` |
 
 ## Audio
 
@@ -72,6 +74,13 @@ The tables below describe the public provider matrix and the environment variabl
 | `bfl` | `BFL_API_KEY` |
 | `ideogram` | `IDEOGRAM_API_KEY` |
 | `stability` | `STABILITY_API_KEY` |
+
+### Compose
+
+| Provider | Env vars |
+| --- | --- |
+| `google` | `GOOGLE_API_KEY` |
+| `bfl` | `BFL_API_KEY` |
 
 ### Edit
 

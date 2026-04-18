@@ -5,9 +5,11 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from ..._core.config import (
+    BASE_URL_DEEPINFRA,
     BASE_URL_DEEPSEEK,
     BASE_URL_FIREWORKS,
     BASE_URL_GROQ,
+    BASE_URL_HUGGINGFACE,
     BASE_URL_MISTRAL,
     BASE_URL_OPENAI,
     BASE_URL_OPENROUTER,
@@ -129,6 +131,25 @@ def build_text_registry(credentials: Mapping[str, str] | CredentialStore | None 
             api_key=store.resolve("PERPLEXITY_API_KEY"),
             base_url=BASE_URL_PERPLEXITY,
             credential_env_vars=get_required_env_vars("text", "generate", "perplexity"),
+        ),
+        OpenAICompatibleTextAdapter(
+            provider="deepinfra",
+            default_model="openai/gpt-oss-20b",
+            supported_models=frozenset({"openai/gpt-oss-20b"}),
+            api_key=store.resolve("DEEPINFRA_API_KEY"),
+            aliases=frozenset({"deep-infra", "deep_infra"}),
+            base_url=BASE_URL_DEEPINFRA,
+            credential_env_vars=get_required_env_vars("text", "generate", "deepinfra"),
+        ),
+        OpenAICompatibleTextAdapter(
+            provider="huggingface",
+            default_model="meta-llama/Llama-3.1-8B-Instruct",
+            supported_models=frozenset({"meta-llama/Llama-3.1-8B-Instruct"}),
+            api_key=store.resolve("HUGGINGFACE_API_KEY"),
+            aliases=frozenset({"hugging-face", "hugging_face", "hf"}),
+            base_url=BASE_URL_HUGGINGFACE,
+            extra_headers={"User-Agent": USER_AGENT},
+            credential_env_vars=get_required_env_vars("text", "generate", "huggingface"),
         ),
     )
     return {adapter.provider: adapter for adapter in adapters}

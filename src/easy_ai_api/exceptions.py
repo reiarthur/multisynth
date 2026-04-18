@@ -1,13 +1,16 @@
-"""Public exception types raised by multisynth."""
+"""Exceções públicas disparadas por easy-ai-api.
+
+Última atualização: 2026-04-18
+"""
 
 from ._core.exceptions import (
     ConfigurationError,
+    EasyAiApiError,
     IncompatibleParameterError,
     InvalidParameterError,
     InvalidProviderResponseError,
     JobFailedError,
     MissingCredentialError,
-    MultisynthError,
     PricingUnavailableError,
     ProviderTimeoutError,
     TemporaryDownloadError,
@@ -17,12 +20,12 @@ from ._core.exceptions import (
 
 __all__ = [
     "ConfigurationError",
+    "EasyAiApiError",
     "IncompatibleParameterError",
     "InvalidParameterError",
     "InvalidProviderResponseError",
     "JobFailedError",
     "MissingCredentialError",
-    "MultisynthError",
     "PricingUnavailableError",
     "ProviderTimeoutError",
     "TemporaryDownloadError",

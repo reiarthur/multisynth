@@ -1,4 +1,7 @@
-"""Canonical provider metadata used by registries, docs, and tests."""
+"""Metadados canônicos de providers usados por registries, docs e testes.
+
+Última atualização: 2026-04-18
+"""
 
 from __future__ import annotations
 
@@ -28,6 +31,8 @@ PROVIDER_SPECS: tuple[ProviderSpec, ...] = (
     ProviderSpec("text", "generate", "google", ("GOOGLE_API_KEY",)),
     ProviderSpec("text", "generate", "cohere", ("COHERE_API_KEY",)),
     ProviderSpec("text", "generate", "perplexity", ("PERPLEXITY_API_KEY",)),
+    ProviderSpec("text", "generate", "deepinfra", ("DEEPINFRA_API_KEY",)),
+    ProviderSpec("text", "generate", "huggingface", ("HUGGINGFACE_API_KEY",)),
     ProviderSpec("audio", "transcription", "deepgram", ("DEEPGRAM_API_KEY",)),
     ProviderSpec("audio", "transcription", "assemblyai", ("ASSEMBLYAI_API_KEY",)),
     ProviderSpec("audio", "transcription", "speechmatics", ("SPEECHMATICS_API_KEY",)),
@@ -53,6 +58,8 @@ PROVIDER_SPECS: tuple[ProviderSpec, ...] = (
     ProviderSpec("image", "transform", "bfl", ("BFL_API_KEY",)),
     ProviderSpec("image", "transform", "ideogram", ("IDEOGRAM_API_KEY",)),
     ProviderSpec("image", "transform", "stability", ("STABILITY_API_KEY",)),
+    ProviderSpec("image", "compose", "google", ("GOOGLE_API_KEY",)),
+    ProviderSpec("image", "compose", "bfl", ("BFL_API_KEY",)),
     ProviderSpec("image", "edit", "openai", ("OPENAI_API_KEY",)),
     ProviderSpec("image", "edit", "google", ("GOOGLE_API_KEY",)),
     ProviderSpec("image", "edit", "bfl", ("BFL_API_KEY",)),

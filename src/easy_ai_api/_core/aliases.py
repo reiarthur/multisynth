@@ -19,6 +19,8 @@ _ALIASES_PADRAO: dict[str, set[str]] = {
     "google": {"gemini", "google-ai", "google_ai", "imagen", "veo", "lyria"},
     "cohere": set(),
     "perplexity": {"pplx"},
+    "deepinfra": {"deep-infra", "deep_infra"},
+    "huggingface": {"hugging-face", "hugging_face", "hf"},
     "ideogram": set(),
     "stability": {"stability-ai", "stable-diffusion"},
     "bfl": {"flux", "black-forest-labs", "black_forest_labs"},

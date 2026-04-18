@@ -1,15 +1,18 @@
-"""Public package exports for multisynth."""
+"""Exports públicos do pacote easy-ai-api.
+
+Última atualização: 2026-04-18
+"""
 
 from ._core.config import VERSION
-from .client import Multisynth
+from .client import EasyAiApi
 from .exceptions import (
     ConfigurationError,
+    EasyAiApiError,
     IncompatibleParameterError,
     InvalidParameterError,
     InvalidProviderResponseError,
     JobFailedError,
     MissingCredentialError,
-    MultisynthError,
     PricingUnavailableError,
     ProviderTimeoutError,
     TemporaryDownloadError,
@@ -17,6 +20,7 @@ from .exceptions import (
     UnsupportedProviderError,
 )
 from .models import (
+    ImageCompositionRequest,
     ImageEditRequest,
     ImageGenerationRequest,
     ImageResult,
@@ -38,6 +42,9 @@ from .models import (
 
 __all__ = [
     "ConfigurationError",
+    "EasyAiApi",
+    "EasyAiApiError",
+    "ImageCompositionRequest",
     "ImageEditRequest",
     "ImageGenerationRequest",
     "ImageResult",
@@ -48,8 +55,6 @@ __all__ = [
     "JobFailedError",
     "LipSyncRequest",
     "MissingCredentialError",
-    "Multisynth",
-    "MultisynthError",
     "MusicGenerationRequest",
     "MusicGenerationResult",
     "PricingUnavailableError",

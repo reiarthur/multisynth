@@ -1,4 +1,7 @@
-"""Internal image schemas used by the provider layer."""
+"""Schemas internos de imagem usados pela camada de providers.
+
+Última atualização: 2026-04-18
+"""
 
 from __future__ import annotations
 
@@ -24,6 +27,21 @@ class TextoParaImagemRequest(FrozenSchema):
 class TextoImagemParaImagemRequest(FrozenSchema):
     prompt: str = Field(min_length=1)
     imagem: str | bytes
+    negative_prompt: str | None = None
+    modelo: str | None = None
+    intensidade: float | None = Field(default=None, ge=0, le=1)
+    seed: int | None = None
+    timeout_segundos: float = Field(default=DEFAULT_TIMEOUT_SECONDS, gt=0)
+    max_tentativas: int = Field(default=DEFAULT_RETRIES, ge=1, le=10)
+    parametros_provider: dict[str, object] | None = None
+
+
+class ComporImagemRequest(FrozenSchema):
+    """Payload interno para composição imagem+imagem+texto → imagem."""
+
+    prompt: str = Field(min_length=1)
+    imagem: str | bytes
+    imagem_referencia: str | bytes
     negative_prompt: str | None = None
     modelo: str | None = None
     intensidade: float | None = Field(default=None, ge=0, le=1)

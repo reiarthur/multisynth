@@ -1,4 +1,7 @@
-"""Static package configuration and provider metadata."""
+"""Configuração estática do pacote e metadados de providers.
+
+Última atualização: 2026-04-18
+"""
 
 from __future__ import annotations
 
@@ -6,8 +9,8 @@ from decimal import Decimal
 
 from .provider_catalog import KNOWN_CREDENTIAL_ENV_VARS as _KNOWN_CREDENTIAL_ENV_VARS
 
-VERSION = "0.1.0"
-USER_AGENT = f"multisynth/{VERSION}"
+VERSION = "0.2.0"
+USER_AGENT = f"easy-ai-api/{VERSION}"
 
 DEFAULT_TIMEOUT_SECONDS = 60.0
 DEFAULT_DOWNLOAD_TIMEOUT_SECONDS = 180.0
@@ -53,6 +56,10 @@ BASE_URL_LOUDLY = "https://soundtracks.loudly.com"
 BASE_URL_RUNWAY = "https://api.dev.runwayml.com/v1"
 BASE_URL_LUMA = "https://api.lumalabs.ai/dream-machine/v1"
 BASE_URL_FAL = "https://queue.fal.run"
+BASE_URL_DEEPINFRA = "https://api.deepinfra.com/v1/openai"
+BASE_URL_HUGGINGFACE = "https://router.huggingface.co/v1"
+BASE_URL_REPLICATE = "https://api.replicate.com/v1"
+BASE_URL_EDENAI = "https://api.edenai.run/v2"
 BASE_URL_HEYGEN = "https://api.heygen.com/v2"
 BASE_URL_DID = "https://api.d-id.com"
 BASE_URL_HEDRA = "https://api.hedra.com/web-app/public"

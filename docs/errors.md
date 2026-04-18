@@ -1,11 +1,11 @@
 # Error Handling and Troubleshooting
 
-`multisynth` uses typed exceptions so application code can handle failures intentionally. All exceptions inherit from `MultisynthError`.
+`easy-ai-api` uses typed exceptions so application code can handle failures intentionally. All exceptions inherit from `EasyAiApiError`.
 
 ## Exception hierarchy
 
 ```
-MultisynthError
+EasyAiApiError
 ├── ConfigurationError
 │   └── MissingCredentialError
 ├── UnsupportedProviderError
@@ -21,7 +21,7 @@ MultisynthError
 
 ## Exception descriptions
 
-- `MultisynthError` — base class for all library exceptions. Catch this to handle any multisynth failure generically.
+- `EasyAiApiError` — base class for all library exceptions. Catch this to handle any easy-ai-api failure generically.
 - `ConfigurationError` — base class for credential and configuration problems. Catch this when you want to handle any setup error without caring about the specific subtype.
 - `MissingCredentialError` — the selected provider was called without the required environment variables or explicit credentials. Exposes `.provider` (canonical provider name) and `.env_vars` (tuple of variable names that must be set).
 - `UnsupportedProviderError` — the provider name or alias is unknown.
@@ -37,8 +37,8 @@ MultisynthError
 ## Missing credentials
 
 ```python
-from multisynth.exceptions import MissingCredentialError
-from multisynth.text import generate
+from easy_ai_api.exceptions import MissingCredentialError
+from easy_ai_api.text import generate
 
 try:
     generate(provider="openai", instructions="Write one sentence.")
@@ -54,8 +54,8 @@ A `MissingCredentialError` for one provider does **not** affect other providers.
 `MissingCredentialError` is a subclass of `ConfigurationError`. Catch `ConfigurationError` when you want to handle any credential or setup failure without caring about the specific type:
 
 ```python
-from multisynth.exceptions import ConfigurationError
-from multisynth.text import generate
+from easy_ai_api.exceptions import ConfigurationError
+from easy_ai_api.text import generate
 
 try:
     generate(provider="openai", instructions="Write one sentence.")
@@ -66,8 +66,8 @@ except ConfigurationError as exc:
 ## Unsupported provider or model
 
 ```python
-from multisynth.exceptions import UnsupportedModelError, UnsupportedProviderError
-from multisynth.text import generate
+from easy_ai_api.exceptions import UnsupportedModelError, UnsupportedProviderError
+from easy_ai_api.text import generate
 
 try:
     generate(provider="unknown-provider", instructions="Hello.")
@@ -83,8 +83,8 @@ except UnsupportedModelError as exc:
 ## Long-running job failures
 
 ```python
-from multisynth.exceptions import JobFailedError, ProviderTimeoutError
-from multisynth.video import generate
+from easy_ai_api.exceptions import JobFailedError, ProviderTimeoutError
+from easy_ai_api.video import generate
 
 try:
     result = generate(
@@ -103,8 +103,8 @@ except JobFailedError as exc:
 `PricingUnavailableError` is raised only when pricing information is explicitly requested and cannot be computed. For text generation, `cost_usd` in the result is always populated — if pricing data is missing for the model, the library raises this error instead of returning a silent zero.
 
 ```python
-from multisynth.exceptions import PricingUnavailableError
-from multisynth.text import generate
+from easy_ai_api.exceptions import PricingUnavailableError
+from easy_ai_api.text import generate
 
 try:
     result = generate(provider="openai", instructions="Hello.", model="gpt-99-ultra")

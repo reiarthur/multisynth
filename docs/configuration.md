@@ -1,6 +1,6 @@
 # Configuration
 
-`multisynth` resolves credentials lazily:
+`easy-ai-api` resolves credentials lazily:
 
 1. values passed through `credentials={...}`
 2. environment variables from the current process
@@ -34,7 +34,7 @@ Use `python-dotenv` in the application entrypoint, not inside the library itself
 ## Explicit credentials per call
 
 ```python
-from multisynth.text import generate
+from easy_ai_api.text import generate
 
 result = generate(
     provider="openai",
@@ -46,9 +46,9 @@ result = generate(
 ## Client-wide shared credentials
 
 ```python
-from multisynth import Multisynth
+from easy_ai_api import EasyAiApi
 
-client = Multisynth(
+client = EasyAiApi(
     credentials={"OPENAI_API_KEY": "sk-..."},
     timeout_seconds=90,
     max_retries=4,

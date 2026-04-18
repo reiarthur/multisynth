@@ -1,6 +1,6 @@
 import pytest
 
-from multisynth import image
+from easy_ai_api import image
 
 
 class _FakeImageAdapter:
@@ -17,6 +17,7 @@ class _FakeImageAdapter:
 class _FakeRegistries:
     generate = {"openai": _FakeImageAdapter()}
     transform = {"openai": _FakeImageAdapter()}
+    compose = {"google": _FakeImageAdapter()}
     edit_without_mask = {"openai": _FakeImageAdapter()}
     edit_with_mask = {"openai": _FakeImageAdapter()}
 
@@ -34,3 +35,27 @@ async def test_transform_async_mocked(monkeypatch) -> None:
     monkeypatch.setattr(image, "build_image_registries", lambda credentials=None: _FakeRegistries())
     transformed = await image.transform_async(provider="openai", prompt="cat", image=b"img")
     assert transformed.image_base64 == "ZmFrZS1pbWFnZQ=="
+
+
+def test_compose_mocked(monkeypatch) -> None:
+    monkeypatch.setattr(image, "build_image_registries", lambda credentials=None: _FakeRegistries())
+    result = image.compose(
+        provider="google",
+        prompt="render person of image 1 in the style of image 2",
+        image=b"img1",
+        reference_image=b"img2",
+    )
+    assert result.image_base64 == "ZmFrZS1pbWFnZQ=="
+    assert result.metadata["provider"] == "google"
+
+
+@pytest.mark.asyncio
+async def test_compose_async_mocked(monkeypatch) -> None:
+    monkeypatch.setattr(image, "build_image_registries", lambda credentials=None: _FakeRegistries())
+    result = await image.compose_async(
+        provider="google",
+        prompt="combine",
+        image=b"img1",
+        reference_image=b"img2",
+    )
+    assert result.image_base64 == "ZmFrZS1pbWFnZQ=="

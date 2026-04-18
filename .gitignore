@@ -1,7 +1,7 @@
 # Credenciais e ambiente
 .env
 .venv
-.venv-multisynth
+.venv-easy-ai-api
 
 # Build e distribuição
 build/
